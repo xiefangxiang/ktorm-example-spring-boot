@@ -2,8 +2,8 @@
 plugins {
     id("org.springframework.boot") version "2.4.5"
     id("io.spring.dependency-management") version "0.6.0.RELEASE"
-    kotlin("jvm") version "1.5.32"
-    kotlin("plugin.spring") version "1.5.32"
+    kotlin("jvm") version "1.6.10"
+    kotlin("plugin.spring") version "1.6.10"
 }
 
 group = "org.ktorm"
@@ -24,7 +24,7 @@ dependencies {
     implementation("org.ktorm:ktorm-core:3.5.0")
     implementation("org.ktorm:ktorm-jackson:3.5.0")
     implementation("org.ktorm:ktorm-support-mysql:3.5.0")
-    implementation("mysql:mysql-connector-java:8.0.13")
+    implementation("mysql:mysql-connector-java:5.1.27") //mysql-connector-java 8无法连接mysql5.17
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
