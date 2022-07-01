@@ -46,6 +46,19 @@ class EventDao(private val database: Database) {
             .map { row -> EventTable1.createEntity(row) }
             .toList()
 
+        val toList2 = database.from(EventTable1)
+            .select(EventTable1.algoId, EventTable1.algoName, EventTable1.eventTime)
+            .whereWithConditions {
+                if (areaId != 0L) {
+                    it += EventTable1.areaId eq areaId
+                }
+                if (algoIds.isNotEmpty()) {
+                    it += EventTable1.algoId inList algoIds
+                }
+            }
+            .map { row -> EventTable1.createEntity(row) }
+            .toList()
+
         //序列
         val toList1: List<Event> = database.events
             .filterColumns { it.columns - it.id - it.areaId }//还可以用-剔除字段
@@ -61,6 +74,7 @@ class EventDao(private val database: Database) {
             .where { (EventTable1.areaId eq areaId) and (EventTable1.algoId inList algoIds) }
             .groupBy(EventTable1.algoId)
             .orderBy(count(EventTable1.algoId).desc())
+            //这里也可以map到AlgoCnt对象上返回一个list.cnt如何直接映射到对象上?mybatis可以定义一个新对象和sql的返回值字段对应
             .forEach { row -> println("算法id:${row.getLong(1)} 算法名称:${row.getString(2)} 事件汇总:${row.getInt(3)}次") }
 
         //序列
@@ -68,6 +82,7 @@ class EventDao(private val database: Database) {
             .filterColumns { it.columns - it.id - it.areaId }
             .filter { EventTable1.areaId eq areaId }
             .filter { EventTable1.algoId inList algoIds }
+            .mapColumns { it.algoId }
             .groupingBy { EventTable1.algoId }  //groupBy是一种终止操作,把数据全部取到内存再分组
             .eachCount()
         //如果表结构关联了外表的id,这里用外表id做filter还会自动生成连表SQL
