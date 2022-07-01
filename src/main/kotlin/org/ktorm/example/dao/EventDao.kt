@@ -40,13 +40,13 @@ class EventDao(private val database: Database) {
 
     fun findByAreaIdAndAlgoIds1(areaId: Long, algoIds: List<Long>) {
         //SQL DSL
-        val toList = database.from(EventTable1)
+        val toList: List<Event> = database.from(EventTable1)
             .select(EventTable1.algoId, EventTable1.algoName, EventTable1.eventTime)
             .where { (EventTable1.areaId eq areaId) and (EventTable1.algoId inList algoIds) }
             .map { row -> EventTable1.createEntity(row) }
             .toList()
 
-        val toList2 = database.from(EventTable1)
+        val toList2: List<Event> = database.from(EventTable1)
             .select(EventTable1.algoId, EventTable1.algoName, EventTable1.eventTime)
             .whereWithConditions {
                 if (areaId != 0L) {
@@ -78,12 +78,12 @@ class EventDao(private val database: Database) {
             .forEach { row -> println("算法id:${row.getLong(1)} 算法名称:${row.getString(2)} 事件汇总:${row.getInt(3)}次") }
 
         //序列
-        val toList = database.sequenceOf(EventTable1)
+        val map = database.sequenceOf(EventTable1)
             .filterColumns { it.columns - it.id - it.areaId }
             .filter { EventTable1.areaId eq areaId }
             .filter { EventTable1.algoId inList algoIds }
-            .mapColumns { it.algoId }
-            .groupingBy { EventTable1.algoId }  //groupBy是一种终止操作,把数据全部取到内存再分组
+            //groupBy是一种终止操作,把数据全部取到内存再分组
+            .groupingBy { EventTable1.algoId }
             .eachCount()
         //如果表结构关联了外表的id,这里用外表id做filter还会自动生成连表SQL
         //生成SQL
