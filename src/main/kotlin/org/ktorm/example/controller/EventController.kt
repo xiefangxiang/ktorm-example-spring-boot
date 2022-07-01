@@ -13,9 +13,7 @@ import org.springframework.web.bind.annotation.RestController
 class EventController(private val eventDao: EventDao) {
     @GetMapping("/query")
     fun query() {
-        eventDao.statistics(1, listOf(10, 11))
-        eventDao.statistics()
-        //eventDao.statistics1()
-        eventDao.statistics2(1, listOf(10, 11))
+        eventDao.findByAreaIdAndAlgoIds1(1, listOf(10, 11))
+        eventDao.statisticsByAreaIdAndAlgoIds1(1, listOf(10, 11))
     }
 }

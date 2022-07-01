@@ -23,11 +23,12 @@ object EventTable : Table<Nothing>("t_event_info") {
     val eventTime = datetime("event_time")
 }
 
-//除了 SQL DSL 以外,Ktorm 也支持实体对象.既支持SQL DSL也支持sequenceOf序列API
+//除了 SQL DSL 以外,Ktorm 也支持实体对象.既支持SQL DSL也支持sequenceOf序列API-单表用序列api自动生成SQL-连表用SQL DSL
 //表结构,这种实体类与列绑定,就可以使用序列 API 对实体进行各种灵活的操作,这种自动生成SQL
 //先给 Database 定义两个扩展属性，它们使用 sequenceOf 函数创建序列对象并返回,这两个属性可以帮助我们提高代码的可读性：
 //val Database.departments get() = this.sequenceOf(Departments)
 //Ktorm 提供了一套名为”实体序列”的 API，用来从数据库中获取实体对象。正如其名字所示，它的风格和使用方式与 Kotlin 标准库中的序列 API 极其类似，它提供了许多同名的扩展函数，比如 filter、map、reduce 等
+//就是使用序列api和SQL语句对应起来映射起来,Sequence API 像集合一样操作数据库
 object EventTable1 : Table<Event>("t_event_info") {
     val id = long("id").primaryKey().bindTo { it.id }
     val areaId = long("area_id").bindTo { it.areaId }
@@ -47,4 +48,5 @@ interface Event : Entity<Event> {
     val eventTime: LocalDateTime
 }
 
+//先给 Database 定义两个扩展属性，它们使用 sequenceOf 函数创建序列对象并返回,这两个属性可以帮助我们提高代码的可读性
 val Database.events get() = this.sequenceOf(EventTable1)
