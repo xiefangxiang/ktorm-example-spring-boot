@@ -70,14 +70,23 @@ class EventDao(private val database: Database) {
 
     fun statisticsByAreaIdAndAlgoIds1(areaId: Long, algoIds: List<Long>) {
         //SQL DSL
-        database.from(EventTable1)
+        val toList: List<AlgoCnt> = database.from(EventTable1)
             .select(EventTable1.algoId, EventTable1.algoName, count(EventTable1.algoId))
             .where { (EventTable1.areaId eq areaId) and (EventTable1.algoId inList algoIds) }
             .groupBy(EventTable1.algoId)
             .orderBy(count(EventTable1.algoId).desc())
-            //这里也可以map到AlgoCnt对象上返回一个list.mybatis可以定义一个新对象带有cnt字段和sql的返回值字段对应count(1) as cnt
-            //cnt如何直接映射到对象上,可以在表结构上面定义count然后直接映射上去吗?
-            .forEach { row -> println("算法id:${row.getLong(1)} 算法名称:${row.getString(2)} 事件汇总:${row.getInt(3)}次") }
+            //mybatis可以定义一个新对象带有cnt字段和sql的返回值字段count(1) as cnt对应
+            //这里也可以手动map到AlgoCnt对象上返回一个list
+            //cnt如何直接自动映射到对象上,可以在表结构上面定义count然后直接映射上去吗?没有办法做到,表结构定义的都是数据库现有的字段,聚合函数产生的新字段count,必须等到结果取出来后,通过map手动映射到新对象上面
+            .map { row ->
+                AlgoCnt(
+                    row.getLong(1),
+                    row.getString(2) ?: "no name",
+                    row.getInt(3)
+                )
+            }
+            .toList()
+        //.forEach { row -> println("算法id:${row.getLong(1)} 算法名称:${row.getString(2)} 事件汇总:${row.getInt(3)}次") }
 
         //序列
         val map = database.sequenceOf(EventTable1)
@@ -101,7 +110,7 @@ class EventDao(private val database: Database) {
 }
 
 data class AlgoCnt(
-    var algoId: Long,
-    var algoName: String,
-    var count: Long,
+    val algoId: Long,
+    val algoName: String,
+    val count: Int,
 )
