@@ -75,7 +75,7 @@ class EventDao(private val database: Database) {
             .where { (EventTable1.areaId eq areaId) and (EventTable1.algoId inList algoIds) }
             .groupBy(EventTable1.algoId)
             .orderBy(count(EventTable1.algoId).desc())
-            //这里也可以map到AlgoCnt对象上返回一个list.mybatis可以定义一个新对象和sql的返回值字段对应
+            //这里也可以map到AlgoCnt对象上返回一个list.mybatis可以定义一个新对象带有cnt字段和sql的返回值字段对应count(1) as cnt
             //cnt如何直接映射到对象上,可以在表结构上面定义count然后直接映射上去吗?
             .forEach { row -> println("算法id:${row.getLong(1)} 算法名称:${row.getString(2)} 事件汇总:${row.getInt(3)}次") }
 
