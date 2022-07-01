@@ -84,7 +84,7 @@ class EventDao(private val database: Database) {
             .filter { EventTable1.algoId inList algoIds }
             //groupBy是一种终止操作,把数据全部取到内存再分组
             .groupingBy { EventTable1.algoId }
-            //这种分组还是没有写SQL灵活,这种最终只会取algoId为key,count为value作为一个map,algoName会丢掉
+            //这种分组还是没有写SQL灵活,这种最终只会取algoId为key,count为value作为一个map,algoName会丢掉(想要细粒度还是用SQL DSL吧)
             //当然对于数据库来讲按algoId分组后,其他的字段本来就没有了意义不是准确的会合并随机取一条,但是人为的冗余一个algoName并保证其唯一然后select algoName一并带上也是可以的
             .eachCount()
         //如果表结构关联了外表的id,这里用外表id做filter还会自动生成连表SQL
