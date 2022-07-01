@@ -33,7 +33,7 @@ class EventDao(private val database: Database) {
     //报错,java.lang.IllegalStateException: No entity class configured for table: 't_event_info'
     //说明没有绑定实体类,是不可以用序列API
     fun notWork() {
-        val toList = database.sequenceOf(EventTable)
+        database.sequenceOf(EventTable)
             .filter { EventTable.areaId eq 1 }
             .toList()
     }
@@ -47,7 +47,7 @@ class EventDao(private val database: Database) {
             .map { row -> EventTable1.createEntity(row) }
             .toList()
 
-        val toList2: List<Event> = database.from(EventTable1)
+        val toList1: List<Event> = database.from(EventTable1)
             .select(EventTable1.algoId, EventTable1.algoName, EventTable1.eventTime)
             .whereWithConditions {
                 if (areaId != 0L) {
@@ -61,7 +61,7 @@ class EventDao(private val database: Database) {
             .toList()
 
         //序列
-        val toList1: List<Event> = database.events
+        val toList2: List<Event> = database.events
             .filterColumns { it.columns - it.id - it.areaId }//还可以用-剔除字段
             .filter { EventTable1.areaId eq areaId }
             .filter { EventTable1.algoId inList algoIds }
