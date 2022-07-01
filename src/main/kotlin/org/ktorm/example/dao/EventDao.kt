@@ -43,6 +43,7 @@ class EventDao(private val database: Database) {
         val toList: List<Event> = database.from(EventTable1)
             .select(EventTable1.algoId, EventTable1.algoName, EventTable1.eventTime)
             .where { (EventTable1.areaId eq areaId) and (EventTable1.algoId inList algoIds) }
+            //复杂嵌套查询where { (EventTable1.areaId eq areaId) and ((EventTable1.algoId inList algoIds) or (EventTable1.algoName like "d"))}
             .map { row -> EventTable1.createEntity(row) }
             .toList()
 
